@@ -10,6 +10,7 @@ func Router() chi.Router {
 
 	r.Route("/users", func(r chi.Router) {
 		r.Post("/", controllers.UserController{}.CreateUser)
+		r.Post("/{userId}", controllers.UserController{}.UpdateUser)
 	})
 
 	return r
