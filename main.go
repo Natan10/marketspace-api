@@ -2,9 +2,13 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 
+	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
 	"github.com/natan10/marketspace-api/configs"
+	"github.com/natan10/marketspace-api/router"
 )
 
 func init() {
@@ -12,11 +16,22 @@ func init() {
 }
 
 func main() {
-	fmt.Println("Iniciando")
+	port := os.Getenv("SERVER_PORT")
+	ch := chi.NewRouter()
 
-	_, err := configs.OpenConn()
+	ch.Use(middleware.Heartbeat("/healthy"))
+	ch.Use(middleware.Logger)
 
-	fmt.Println(err)
+	ch.Route("/v1", func(ch chi.Router) {
+		ch.Mount("/", router.Router())
+	})
 
-	fmt.Println("PORT:", os.Getenv("PORT"))
+	http.ListenAndServe(fmt.Sprintf(":%v", port), ch)
 }
+
+// TODO - AUTH
+// TODO - USER CRUD
+// TODO - user get
+// TODO - user create
+// TODO - user update
+// TODO - ANNOUCEMENT CRUD
