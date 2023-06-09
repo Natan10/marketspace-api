@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 
@@ -26,6 +27,7 @@ func main() {
 		ch.Mount("/", router.Router())
 	})
 
+	log.Printf("Server running at %v \n", port)
 	http.ListenAndServe(fmt.Sprintf(":%v", port), ch)
 }
 

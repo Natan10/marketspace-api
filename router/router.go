@@ -13,5 +13,10 @@ func Router() chi.Router {
 		r.Post("/{userId}", controllers.UserController{}.UpdateUser)
 	})
 
+	r.Route("/announcements", func(r chi.Router) {
+		r.Post("/", controllers.AnnouncementsController{}.CreateAnnouncement)
+		r.Post("/{announcementId}", controllers.AnnouncementsController{}.UpdateAnnouncement)
+	})
+
 	return r
 }
