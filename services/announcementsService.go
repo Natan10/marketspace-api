@@ -117,3 +117,22 @@ func UpdateAnnouncement(id int64, an dtos.AnnouncementDTO) (int64, error) {
 
 	return rows.RowsAffected()
 }
+
+func DeleteAnnouncement(id int64) (int64, error) {
+	db, err := configs.OpenConn()
+
+	if err != nil {
+		log.Fatalf("Error to connect db:%v", err)
+		return 0, err
+	}
+
+	defer db.Close()
+
+	rows, err := db.Exec("DELETE from announcements WHERE id=$1", id)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return rows.RowsAffected()
+}
