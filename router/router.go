@@ -15,7 +15,8 @@ func Router() chi.Router {
 
 	r.Route("/announcements", func(r chi.Router) {
 		r.Post("/", controllers.AnnouncementsController{}.CreateAnnouncement)
-		r.Post("/{announcementId}", controllers.AnnouncementsController{}.UpdateAnnouncement)
+		r.Put("/{announcementId}", controllers.AnnouncementsController{}.UpdateAnnouncement)
+		r.Delete("/{announcementId}", controllers.AnnouncementsController{}.DeleteAnnouncement)
 	})
 
 	return r

@@ -90,4 +90,40 @@ func (ac AnnouncementsController) UpdateAnnouncement(w http.ResponseWriter, r *h
 	json.NewEncoder(w).Encode(response)
 }
 
-// func (ac AnnouncementsController) DeleteAnnouncement(w http.ResponseWriter, r *http.Request) {}
+func (ac AnnouncementsController) DeleteAnnouncement(w http.ResponseWriter, r *http.Request) {
+	announcementId, err := strconv.Atoi(chi.URLParam(r, "announcementId"))
+
+	if err != nil {
+		log.Fatalf("Error:%v", err)
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	rows, err := services.DeleteAnnouncement(int64(announcementId))
+
+	var response map[string]any
+
+	if err != nil {
+		response = map[string]any{
+			"Error":   true,
+			"Message": fmt.Sprintf("Erro ao remover anuncion: %v\n", err),
+		}
+	}
+
+	if rows == 0 {
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	if rows > 1 {
+		log.Printf("Numero de anuncios removidos errado: %v\n", rows)
+	}
+
+	response = map[string]any{
+		"Error":   false,
+		"Message": "Anuncio removido com sucesso!",
+	}
+
+	w.Header().Add("Content-type", "application/json")
+	json.NewEncoder(w).Encode(response)
+}
