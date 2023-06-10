@@ -32,8 +32,3 @@ func main() {
 }
 
 // TODO - AUTH
-// TODO - USER CRUD
-// TODO - user get
-// TODO - user create
-// TODO - user update
-// TODO - ANNOUCEMENT CRUD

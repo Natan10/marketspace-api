@@ -17,6 +17,51 @@ type AnnouncementsController struct {
 	Service services.IAnnouncementsService
 }
 
+func (ac *AnnouncementsController) Get(w http.ResponseWriter, r *http.Request) {
+	param := r.URL.Query().Get("userId")
+
+	if param == "" {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	userId, err := strconv.Atoi(param)
+
+	if err != nil {
+		log.Fatalf("Error:%v", err)
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	announcementId, err := strconv.Atoi(chi.URLParam(r, "announcementId"))
+
+	if err != nil {
+		log.Printf("Error:%v\n", err)
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	var announcement *models.Announcement
+
+	announcement, err = ac.Service.GetAnnouncement(int64(userId), int64(announcementId))
+
+	if announcement == nil && err == nil {
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	} else if announcement == nil && err != nil {
+		log.Printf("Error:%v\n", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	} else {
+		response := map[string]models.Announcement{
+			"data": *announcement,
+		}
+
+		w.Header().Add("Content-type", "application/json")
+		json.NewEncoder(w).Encode(response)
+	}
+}
+
 func (ac *AnnouncementsController) GetAll(w http.ResponseWriter, r *http.Request) {
 
 	param := r.URL.Query().Get("userId")

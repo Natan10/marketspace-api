@@ -22,6 +22,7 @@ func Router() chi.Router {
 
 	r.Route("/announcements", func(r chi.Router) {
 		r.Get("/", AnnouncementController.GetAll)
+		r.Get("/{announcementId}", AnnouncementController.Get)
 		r.Post("/", AnnouncementController.CreateAnnouncement)
 		r.Put("/{announcementId}", AnnouncementController.UpdateAnnouncement)
 		r.Delete("/{announcementId}", AnnouncementController.DeleteAnnouncement)

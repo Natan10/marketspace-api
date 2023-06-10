@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"log"
 
@@ -12,6 +13,7 @@ import (
 )
 
 type IAnnouncementsService interface {
+	GetAnnouncement(useId int64, announcementId int64) (announcement *models.Announcement, err error)
 	GetAllAnnouncements(user_id int64) (announcements []models.Announcement, err error)
 	CreateAnnouncement(an dtos.AnnouncementDTO) (id int16, err error)
 	UpdateAnnouncement(id int64, an dtos.AnnouncementDTO) (int64, error)
@@ -20,7 +22,67 @@ type IAnnouncementsService interface {
 
 type AnnouncementsService struct{}
 
-func (s *AnnouncementsService) GetAllAnnouncements(user_id int64) (announcements []models.Announcement, err error) {
+func (s *AnnouncementsService) GetAnnouncement(useId int64, announcementId int64) (announcement *models.Announcement, err error) {
+	db, err := configs.OpenConn()
+
+	if err != nil {
+		log.Fatalf("Error to connect db: %v", err)
+		return
+	}
+
+	defer db.Close()
+
+	sqlStatement := `
+		SELECT
+			a.id,
+			a.title,
+			a.description,
+			a.is_new,
+			a.price,
+			a.is_exchangeable,
+			a.is_active,
+			a.images,
+			a.user_id,
+			p.boleto,
+			p.pix,
+			p.cash,
+			p.credit_card,
+			p.bank_deposit
+		FROM announcements a INNER JOIN payment_methods p
+		ON p.announcement_id = a.id and p.announcement_id=$2
+		WHERE a.user_id=$1
+	`
+	announcement = &models.Announcement{}
+
+	err = db.QueryRow(sqlStatement, useId, announcementId).Scan(
+		&announcement.Id,
+		&announcement.Title,
+		&announcement.Description,
+		&announcement.IsNew,
+		&announcement.Price,
+		&announcement.IsExchangeable,
+		&announcement.IsActive,
+		pq.Array(&announcement.Images),
+		&announcement.UserId,
+		&announcement.Boleto,
+		&announcement.Pix,
+		&announcement.Cash,
+		&announcement.CreditCard,
+		&announcement.BankDeposit,
+	)
+
+	switch err {
+	case sql.ErrNoRows:
+		log.Printf("Error query: %v\n", err)
+		return nil, nil
+	case nil:
+		return announcement, nil
+	default:
+		return nil, err
+	}
+}
+
+func (s *AnnouncementsService) GetAllAnnouncements(useId int64) (announcements []models.Announcement, err error) {
 	db, err := configs.OpenConn()
 
 	if err != nil {
@@ -51,7 +113,7 @@ func (s *AnnouncementsService) GetAllAnnouncements(user_id int64) (announcements
 		WHERE a.user_id=$1
 	`
 
-	rows, err := db.Query(sql, user_id)
+	rows, err := db.Query(sql, useId)
 
 	if err != nil {
 		log.Printf("Error query: %v\n", err)
