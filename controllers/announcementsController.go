@@ -9,12 +9,59 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/natan10/marketspace-api/dtos"
+	"github.com/natan10/marketspace-api/models"
 	"github.com/natan10/marketspace-api/services"
 )
 
-type AnnouncementsController struct{}
+type AnnouncementsController struct {
+	Service services.IAnnouncementsService
+}
 
-func (ac AnnouncementsController) CreateAnnouncement(w http.ResponseWriter, r *http.Request) {
+func (ac *AnnouncementsController) GetAll(w http.ResponseWriter, r *http.Request) {
+
+	param := r.URL.Query().Get("userId")
+
+	if param == "" {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	userId, err := strconv.Atoi(param)
+
+	if err != nil {
+		log.Fatalf("Error:%v", err)
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	announcements, err := ac.Service.GetAllAnnouncements(int64(userId))
+
+	fmt.Println(announcements)
+
+	if err != nil {
+		log.Fatalf("Error:%v", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	var response map[string][]models.Announcement
+
+	if len(announcements) > 0 {
+		response = map[string][]models.Announcement{
+			"data": announcements,
+		}
+	} else {
+		announcements = make([]models.Announcement, 0)
+		response = map[string][]models.Announcement{
+			"data": announcements,
+		}
+	}
+
+	w.Header().Add("Content-type", "application/json")
+	json.NewEncoder(w).Encode(response)
+}
+
+func (ac *AnnouncementsController) CreateAnnouncement(w http.ResponseWriter, r *http.Request) {
 	var announcement dtos.AnnouncementDTO
 
 	err := json.NewDecoder(r.Body).Decode(&announcement)
@@ -27,7 +74,7 @@ func (ac AnnouncementsController) CreateAnnouncement(w http.ResponseWriter, r *h
 
 	var response map[string]any
 
-	id, err := services.CreateAnnouncement(announcement)
+	id, err := ac.Service.CreateAnnouncement(announcement)
 
 	if err != nil {
 		response = map[string]any{
@@ -45,7 +92,7 @@ func (ac AnnouncementsController) CreateAnnouncement(w http.ResponseWriter, r *h
 	json.NewEncoder(w).Encode(response)
 }
 
-func (ac AnnouncementsController) UpdateAnnouncement(w http.ResponseWriter, r *http.Request) {
+func (ac *AnnouncementsController) UpdateAnnouncement(w http.ResponseWriter, r *http.Request) {
 	announcementId, err := strconv.Atoi(chi.URLParam(r, "announcementId"))
 
 	if err != nil {
@@ -66,7 +113,7 @@ func (ac AnnouncementsController) UpdateAnnouncement(w http.ResponseWriter, r *h
 
 	var response map[string]any
 
-	rows, err := services.UpdateAnnouncement(int64(announcementId), announcement)
+	rows, err := ac.Service.UpdateAnnouncement(int64(announcementId), announcement)
 
 	if err != nil {
 		response = map[string]any{
@@ -90,7 +137,7 @@ func (ac AnnouncementsController) UpdateAnnouncement(w http.ResponseWriter, r *h
 	json.NewEncoder(w).Encode(response)
 }
 
-func (ac AnnouncementsController) DeleteAnnouncement(w http.ResponseWriter, r *http.Request) {
+func (ac *AnnouncementsController) DeleteAnnouncement(w http.ResponseWriter, r *http.Request) {
 	announcementId, err := strconv.Atoi(chi.URLParam(r, "announcementId"))
 
 	if err != nil {
@@ -99,7 +146,7 @@ func (ac AnnouncementsController) DeleteAnnouncement(w http.ResponseWriter, r *h
 		return
 	}
 
-	rows, err := services.DeleteAnnouncement(int64(announcementId))
+	rows, err := ac.Service.DeleteAnnouncement(int64(announcementId))
 
 	var response map[string]any
 
