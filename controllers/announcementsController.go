@@ -17,6 +17,17 @@ type AnnouncementsController struct {
 	Service services.IAnnouncementsService
 }
 
+// @Summary Get Announcement
+// @Tags announcements
+// @Accept json
+// @Produce json
+// @Param userId query int true "user id"
+// @Param announcementId path int true "announcement id"
+// @Success 200 {object} map[string]models.Announcement
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /announcements/{announcementId} [get]
 func (ac *AnnouncementsController) Get(w http.ResponseWriter, r *http.Request) {
 	param := r.URL.Query().Get("userId")
 
@@ -62,6 +73,16 @@ func (ac *AnnouncementsController) Get(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// @Summary Get Announcements
+// @Tags announcements
+// @Accept json
+// @Produce json
+// @Param userId query int true "user id"
+// @Success 200 {object} map[string]models.Announcement
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /announcements [get]
 func (ac *AnnouncementsController) GetAll(w http.ResponseWriter, r *http.Request) {
 
 	param := r.URL.Query().Get("userId")
@@ -106,6 +127,14 @@ func (ac *AnnouncementsController) GetAll(w http.ResponseWriter, r *http.Request
 	json.NewEncoder(w).Encode(response)
 }
 
+// @Summary Create Announcement
+// @Tags announcements
+// @Accept json
+// @Produce json
+// @Param request body dtos.AnnouncementDTO true "announcement payload"
+// @Success 200 {object} dtos.ResponseDTO
+// @Failure 500 {string} string
+// @Router /announcements [post]
 func (ac *AnnouncementsController) CreateAnnouncement(w http.ResponseWriter, r *http.Request) {
 	var announcement dtos.AnnouncementDTO
 
@@ -117,19 +146,20 @@ func (ac *AnnouncementsController) CreateAnnouncement(w http.ResponseWriter, r *
 		return
 	}
 
-	var response map[string]any
+	var response dtos.ResponseDTO
 
 	id, err := ac.Service.CreateAnnouncement(announcement)
 
 	if err != nil {
-		response = map[string]any{
-			"Error":   true,
-			"Message": fmt.Sprintf("Erro ao criar anuncio: %v", err),
+		response = dtos.ResponseDTO{
+			Error:   true,
+			Message: fmt.Sprintf("Erro ao criar anuncio: %v", err),
 		}
+
 	} else {
-		response = map[string]any{
-			"Error":   false,
-			"Message": fmt.Sprintf("Anuncio criado com sucesso: %v", id),
+		response = dtos.ResponseDTO{
+			Error:   false,
+			Message: fmt.Sprintf("Anuncio criado com sucesso: %v", id),
 		}
 	}
 
@@ -137,6 +167,17 @@ func (ac *AnnouncementsController) CreateAnnouncement(w http.ResponseWriter, r *
 	json.NewEncoder(w).Encode(response)
 }
 
+// @Summary Update Announcement
+// @Tags announcements
+// @Accept json
+// @Produce json
+// @Param announcementId path int true "announcement id"
+// @Param request body dtos.AnnouncementDTO true "announcement payload"
+// @Success 200 {object} dtos.ResponseDTO
+// @Failure 500 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Router /announcements/{announcementId} [put]
 func (ac *AnnouncementsController) UpdateAnnouncement(w http.ResponseWriter, r *http.Request) {
 	announcementId, err := strconv.Atoi(chi.URLParam(r, "announcementId"))
 
@@ -156,32 +197,42 @@ func (ac *AnnouncementsController) UpdateAnnouncement(w http.ResponseWriter, r *
 		return
 	}
 
-	var response map[string]any
+	var response dtos.ResponseDTO
 
 	rows, err := ac.Service.UpdateAnnouncement(int64(announcementId), announcement)
 
 	if err != nil {
-		response = map[string]any{
-			"Error":   true,
-			"Message": fmt.Sprintf("Erro ao atualizar anuncio: %v", err),
+		response = dtos.ResponseDTO{
+			Error:   true,
+			Message: fmt.Sprintf("Erro ao atualizar anuncio: %v", err),
 		}
-	}
+	} else {
+		if rows == 0 {
+			log.Printf("Anuncio nao encontrado: %v\n", rows)
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
 
-	if rows == 0 {
-		log.Printf("Anuncio nao encontrado: %v\n", rows)
-		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-		return
-	}
-
-	response = map[string]any{
-		"Error":   false,
-		"Message": "Anuncio atualizado com sucesso!",
+		response = dtos.ResponseDTO{
+			Error:   false,
+			Message: "Anuncio atualizado com sucesso!",
+		}
 	}
 
 	w.Header().Add("Content-type", "application/json")
 	json.NewEncoder(w).Encode(response)
 }
 
+// @Summary Delete Announcement
+// @Tags announcements
+// @Accept json
+// @Produce json
+// @Param announcementId path int true "announcement id"
+// @Success 200 {object} dtos.ResponseDTO
+// @Failure 500 {string} string
+// @Failure 404 {string} string
+// @Failure 400 {string} string
+// @Router /announcements/{announcementId} [delete]
 func (ac *AnnouncementsController) DeleteAnnouncement(w http.ResponseWriter, r *http.Request) {
 	announcementId, err := strconv.Atoi(chi.URLParam(r, "announcementId"))
 
@@ -193,12 +244,12 @@ func (ac *AnnouncementsController) DeleteAnnouncement(w http.ResponseWriter, r *
 
 	rows, err := ac.Service.DeleteAnnouncement(int64(announcementId))
 
-	var response map[string]any
+	var response dtos.ResponseDTO
 
 	if err != nil {
-		response = map[string]any{
-			"Error":   true,
-			"Message": fmt.Sprintf("Erro ao remover anuncion: %v\n", err),
+		response = dtos.ResponseDTO{
+			Error:   true,
+			Message: fmt.Sprintf("Erro ao remover anuncion: %v\n", err),
 		}
 	}
 
@@ -211,9 +262,9 @@ func (ac *AnnouncementsController) DeleteAnnouncement(w http.ResponseWriter, r *
 		log.Printf("Numero de anuncios removidos errado: %v\n", rows)
 	}
 
-	response = map[string]any{
-		"Error":   false,
-		"Message": "Anuncio removido com sucesso!",
+	response = dtos.ResponseDTO{
+		Error:   false,
+		Message: "Anuncio removido com sucesso!",
 	}
 
 	w.Header().Add("Content-type", "application/json")

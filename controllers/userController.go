@@ -15,6 +15,7 @@ import (
 type UserController struct{}
 
 // @Summary Create User
+// @Tags users
 // @Accept json
 // @Produce json
 // @Param request body dtos.UserDTO true "user payload"
@@ -50,6 +51,7 @@ func (uc UserController) CreateUser(w http.ResponseWriter, r *http.Request) {
 }
 
 // @Summary Update User
+// @Tags users
 // @Accept json
 // @Produce json
 // @Param userId path int true "user id"

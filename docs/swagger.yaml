@@ -1,5 +1,41 @@
 basePath: /v1
 definitions:
+  dtos.AnnouncementDTO:
+    properties:
+      description:
+        type: string
+      images:
+        items:
+          type: string
+        type: array
+      is_active:
+        type: boolean
+      is_exchangeable:
+        type: boolean
+      is_new:
+        type: boolean
+      paymentMethods:
+        $ref: '#/definitions/dtos.PaymentMethodsDTO'
+      price:
+        type: number
+      title:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  dtos.PaymentMethodsDTO:
+    properties:
+      bank_deposit:
+        type: boolean
+      boleto:
+        type: boolean
+      cash:
+        type: boolean
+      credit_card:
+        type: boolean
+      pix:
+        type: boolean
+    type: object
   dtos.ResponseDTO:
     properties:
       error:
@@ -16,6 +52,48 @@ definitions:
       username:
         type: string
     type: object
+  models.Announcement:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      images:
+        items:
+          type: string
+        type: array
+      is_active:
+        type: boolean
+      is_exchangeable:
+        type: boolean
+      is_new:
+        type: boolean
+      payment_methods:
+        $ref: '#/definitions/models.PaymentMethods'
+      price:
+        type: number
+      title:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  models.PaymentMethods:
+    properties:
+      announcement_id:
+        type: integer
+      bank_deposit:
+        type: boolean
+      boleto:
+        type: boolean
+      cash:
+        type: boolean
+      credit_card:
+        type: boolean
+      id:
+        type: integer
+      pix:
+        type: boolean
+    type: object
 host: localhost:8000
 info:
   contact: {}
@@ -24,6 +102,171 @@ info:
   title: MarketSpace Api
   version: "1.0"
 paths:
+  /announcements:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: user id
+        in: query
+        name: userId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              $ref: '#/definitions/models.Announcement'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get Announcements
+      tags:
+      - announcements
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: announcement payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.AnnouncementDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.ResponseDTO'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Create Announcement
+      tags:
+      - announcements
+  /announcements/{announcementId}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: announcement id
+        in: path
+        name: announcementId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.ResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Delete Announcement
+      tags:
+      - announcements
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: user id
+        in: query
+        name: userId
+        required: true
+        type: integer
+      - description: announcement id
+        in: path
+        name: announcementId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              $ref: '#/definitions/models.Announcement'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get Announcement
+      tags:
+      - announcements
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: announcement id
+        in: path
+        name: announcementId
+        required: true
+        type: integer
+      - description: announcement payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.AnnouncementDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.ResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Update Announcement
+      tags:
+      - announcements
   /users:
     post:
       consumes:
@@ -43,6 +286,8 @@ paths:
           schema:
             $ref: '#/definitions/dtos.ResponseDTO'
       summary: Create User
+      tags:
+      - users
   /users/{userId}:
     put:
       consumes:
@@ -67,4 +312,6 @@ paths:
           schema:
             $ref: '#/definitions/dtos.ResponseDTO'
       summary: Update User
+      tags:
+      - users
 swagger: "2.0"
