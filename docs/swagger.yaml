@@ -1,0 +1,70 @@
+basePath: /v1
+definitions:
+  dtos.ResponseDTO:
+    properties:
+      error:
+        type: boolean
+      message:
+        type: string
+    type: object
+  dtos.UserDTO:
+    properties:
+      email:
+        type: string
+      phone:
+        type: string
+      username:
+        type: string
+    type: object
+host: localhost:8000
+info:
+  contact: {}
+  description: This is a web server for MarketSpace application.
+  termsOfService: http://swagger.io/terms/
+  title: MarketSpace Api
+  version: "1.0"
+paths:
+  /users:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: user payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.UserDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: response
+          schema:
+            $ref: '#/definitions/dtos.ResponseDTO'
+      summary: Create User
+  /users/{userId}:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: user id
+        in: path
+        name: userId
+        required: true
+        type: integer
+      - description: user payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.UserDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: response
+          schema:
+            $ref: '#/definitions/dtos.ResponseDTO'
+      summary: Update User
+swagger: "2.0"

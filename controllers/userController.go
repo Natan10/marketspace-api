@@ -14,6 +14,12 @@ import (
 
 type UserController struct{}
 
+// @Summary Create User
+// @Accept json
+// @Produce json
+// @Param request body dtos.UserDTO true "user payload"
+// @Success 200 {object} dtos.ResponseDTO "response"
+// @Router /users [post]
 func (uc UserController) CreateUser(w http.ResponseWriter, r *http.Request) {
 	var user dtos.UserDTO
 
@@ -25,23 +31,31 @@ func (uc UserController) CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var response map[string]any
+	var response dtos.ResponseDTO
 
 	if id, err := services.CreateUser(user); err != nil {
-		response = map[string]any{
-			"Error":   true,
-			"Message": fmt.Sprintf("Erro ao criar usuario: %v", err),
+		response = dtos.ResponseDTO{
+			Error:   true,
+			Message: fmt.Sprintf("Erro ao criar usuario: %v", err),
 		}
+
 	} else {
-		response = map[string]any{
-			"Error":   false,
-			"Message": fmt.Sprintf("Usuario criado com sucesso: %v", id),
+		response = dtos.ResponseDTO{
+			Error:   false,
+			Message: fmt.Sprintf("Usuario criado com sucesso: %v", id),
 		}
 	}
 
 	json.NewEncoder(w).Encode(response)
 }
 
+// @Summary Update User
+// @Accept json
+// @Produce json
+// @Param userId path int true "user id"
+// @Param request body dtos.UserDTO true "user payload"
+// @Success 200 {object} dtos.ResponseDTO "response"
+// @Router /users/{userId} [put]
 func (uc UserController) UpdateUser(w http.ResponseWriter, r *http.Request) {
 
 	userId, err := strconv.Atoi(chi.URLParam(r, "userId"))
@@ -61,8 +75,6 @@ func (uc UserController) UpdateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var response map[string]any
-
 	rows, err := services.UpdateUser(int64(userId), user)
 
 	if err != nil {
@@ -76,9 +88,9 @@ func (uc UserController) UpdateUser(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Numero de usarios atualizados incorreto: %v\n", rows)
 	}
 
-	response = map[string]any{
-		"Error":   false,
-		"Message": "Usuario atualizado com sucesso!",
+	response := dtos.ResponseDTO{
+		Error:   false,
+		Message: "Usuario atualizado com sucesso!",
 	}
 
 	w.Header().Add("Content-type", "application/json")
