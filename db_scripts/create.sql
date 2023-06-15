@@ -1,8 +1,10 @@
-create database workspace;
+create database marketspace;
 
-drop table if exists users 
-drop table if exists announcements 
-drop table if exists payment_methods
+\connect marketspace;
+
+drop table if exists users;
+drop table if exists announcements; 
+drop table if exists payment_methods;
 
 create table if not exists users (
 	id serial primary key,
@@ -10,7 +12,7 @@ create table if not exists users (
 	email varchar(255) unique not null,
 	phone varchar(20) not null,
 	created_at timestamp not null default now()
-)
+);
 
 create table if not exists announcements(
 	id serial primary key,
@@ -23,7 +25,7 @@ create table if not exists announcements(
 	images varchar(255)[] default '{}',
 	user_id int not null,
 	foreign key(user_id) references users(id) on delete cascade
-)
+);
  
 
 create table if not exists payment_methods(
@@ -35,5 +37,5 @@ create table if not exists payment_methods(
 	bank_deposit bool,
 	announcement_id int not null,
 	foreign key(announcement_id) references announcements(id) on delete cascade
-)
+);
 
