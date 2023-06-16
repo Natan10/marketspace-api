@@ -12,7 +12,9 @@ import (
 	"github.com/natan10/marketspace-api/services"
 )
 
-type UserController struct{}
+type UserController struct {
+	Service services.IUserService
+}
 
 // @Summary Create User
 // @Tags users
@@ -21,7 +23,7 @@ type UserController struct{}
 // @Param request body dtos.UserDTO true "user payload"
 // @Success 200 {object} dtos.ResponseDTO "response"
 // @Router /users [post]
-func (uc UserController) CreateUser(w http.ResponseWriter, r *http.Request) {
+func (uc *UserController) CreateUser(w http.ResponseWriter, r *http.Request) {
 	var user dtos.UserDTO
 
 	err := json.NewDecoder(r.Body).Decode(&user)
@@ -34,7 +36,7 @@ func (uc UserController) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	var response dtos.ResponseDTO
 
-	if id, err := services.CreateUser(user); err != nil {
+	if id, err := uc.Service.CreateUser(user); err != nil {
 		response = dtos.ResponseDTO{
 			Error:   true,
 			Message: fmt.Sprintf("Erro ao criar usuario: %v", err),
@@ -58,7 +60,7 @@ func (uc UserController) CreateUser(w http.ResponseWriter, r *http.Request) {
 // @Param request body dtos.UserDTO true "user payload"
 // @Success 200 {object} dtos.ResponseDTO "response"
 // @Router /users/{userId} [put]
-func (uc UserController) UpdateUser(w http.ResponseWriter, r *http.Request) {
+func (uc *UserController) UpdateUser(w http.ResponseWriter, r *http.Request) {
 
 	userId, err := strconv.Atoi(chi.URLParam(r, "userId"))
 
@@ -77,7 +79,7 @@ func (uc UserController) UpdateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rows, err := services.UpdateUser(int64(userId), user)
+	rows, err := uc.Service.UpdateUser(int64(userId), user)
 
 	if err != nil {
 		log.Printf("Erro ao atualizar usuario: %v\n", err)

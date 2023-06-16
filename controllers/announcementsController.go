@@ -102,8 +102,6 @@ func (ac *AnnouncementsController) GetAll(w http.ResponseWriter, r *http.Request
 
 	announcements, err := ac.Service.GetAllAnnouncements(int64(userId))
 
-	fmt.Println(announcements)
-
 	if err != nil {
 		log.Fatalf("Error:%v", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)

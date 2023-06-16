@@ -4,17 +4,16 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"os"
 
 	_ "github.com/lib/pq"
 )
 
 func OpenConn() (*sql.DB, error) {
-	host := os.Getenv("POSTGRES_HOST")
-	port := os.Getenv("POSTGRES_PORT")
-	user := os.Getenv("POSTGRES_USER")
-	password := os.Getenv("POSTGRES_PASSWORD")
-	dbName := os.Getenv("DB_NAME")
+	host := "localhost"         //os.Getenv("POSTGRES_HOST")
+	port := "5432"              //os.Getenv("POSTGRES_PORT")
+	user := "postgres"          //os.Getenv("POSTGRES_USER")
+	password := "workspace2402" // os.Getenv("POSTGRES_PASSWORD")
+	dbName := "workspace"       // os.Getenv("DB_NAME")
 
 	connection := fmt.Sprintf("host=%v port=%v user=%v password=%v dbname=%v sslmode=disable", host, port, user, password, dbName)
 
