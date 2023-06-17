@@ -1,14 +1,15 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 
-	"github.com/go-chi/jwtauth/v5"
 	"github.com/natan10/marketspace-api/configs"
 	_ "github.com/natan10/marketspace-api/docs"
 	"github.com/natan10/marketspace-api/router"
@@ -16,36 +17,20 @@ import (
 )
 
 func init() {
-	configs.Load()
-}
+	env := flag.String("env", "development", "default env")
+	flag.Parse()
 
-func AuthToken(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		tokenA, _, err := jwtauth.FromContext(r.Context())
-
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusUnauthorized)
-			return
-		}
-
-		// jwtauth.VerifyToken(tokenAuth, token)
-
-		// fmt.Printf("Token is Here: %v", token)
-		fmt.Println(tokenA)
-
-		next.ServeHTTP(w, r)
-	})
+	configs.Load(*env)
 }
 
 // @title MarketSpace Api
 // @version 1.0
 // @description This is a web server for MarketSpace application.
 // @termsOfService http://swagger.io/terms/
-
 // @host localhost:8000
 // @BasePath /v1
 func main() {
-	port := "8000" //os.Getenv("SERVER_PORT")
+	port := os.Getenv("SERVER_PORT")
 	ch := chi.NewRouter()
 
 	ch.Use(middleware.Heartbeat("/healthy"))
@@ -61,5 +46,3 @@ func main() {
 	log.Printf("Server running at %v \n", port)
 	http.ListenAndServe(fmt.Sprintf(":%v", port), ch)
 }
-
-// TODO - AUTH

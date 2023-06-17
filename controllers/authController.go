@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/natan10/marketspace-api/dtos"
 	"github.com/natan10/marketspace-api/models"
 	"github.com/natan10/marketspace-api/services"
 )
@@ -12,8 +13,15 @@ type AuthController struct {
 	Service services.IUserService
 }
 
+// @Summary Auth User
+// @Tags authentication
+// @Accept json
+// @Produce json
+// @Param request body dtos.AuthUserDTO true "auth payload"
+// @Success 200 {object} dtos.AuthUserResponseDTO "response"
+// @Router /signin [post]
 func (auth AuthController) SignIn(w http.ResponseWriter, r *http.Request) {
-	var payload map[string]interface{}
+	var payload dtos.AuthUserDTO
 
 	err := json.NewDecoder(r.Body).Decode(&payload)
 
@@ -23,8 +31,8 @@ func (auth AuthController) SignIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	email := payload["email"].(string)
-	password := payload["password"].(string)
+	email := payload.Email
+	password := payload.Password
 
 	var user *models.User
 
@@ -48,7 +56,9 @@ func (auth AuthController) SignIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(map[string]any{
-		"token": token,
-	})
+	tokenResponse := dtos.AuthUserResponseDTO{
+		Token: token,
+	}
+
+	json.NewEncoder(w).Encode(tokenResponse)
 }

@@ -12,17 +12,18 @@ type TokenService struct {
 }
 
 var (
-	tokenFamily = "HS256"
-	tokenSecret = "marketspace_secret"
+	tokenFamily string
+	tokenSecret string
+	TokenAuth   *jwtauth.JWTAuth
 )
-
-var TokenAuth *jwtauth.JWTAuth
 
 func init() {
 	TokenAuth = NewToken()
 }
 
 func NewToken() *jwtauth.JWTAuth {
+	tokenFamily = "HS256"
+	tokenSecret = "development_auth_secret"
 	return jwtauth.New(tokenFamily, []byte(tokenSecret), nil)
 }
 

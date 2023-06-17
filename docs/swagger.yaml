@@ -23,6 +23,18 @@ definitions:
       user_id:
         type: integer
     type: object
+  dtos.AuthUserDTO:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  dtos.AuthUserResponseDTO:
+    properties:
+      token:
+        type: string
+    type: object
   dtos.PaymentMethodsDTO:
     properties:
       bank_deposit:
@@ -267,6 +279,27 @@ paths:
       summary: Update Announcement
       tags:
       - announcements
+  /signin:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: auth payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.AuthUserDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: response
+          schema:
+            $ref: '#/definitions/dtos.AuthUserResponseDTO'
+      summary: Auth User
+      tags:
+      - authentication
   /users:
     post:
       consumes:
