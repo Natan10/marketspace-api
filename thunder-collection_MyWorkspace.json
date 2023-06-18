@@ -1,0 +1,202 @@
+{
+    "client": "Thunder Client",
+    "collectionName": "MyWorkspace",
+    "dateExported": "2023-06-18T21:34:22.338Z",
+    "version": "1.1",
+    "folders": [
+        {
+            "_id": "02f0b239-f18c-42e0-9d9c-37e6e9ee1bab",
+            "name": "Users",
+            "containerId": "",
+            "created": "2023-06-08T02:29:28.929Z",
+            "sortNum": 10000,
+            "settings": {}
+        },
+        {
+            "_id": "9738c362-2d9f-49df-b7cf-73bd6cf65310",
+            "name": "Announcements",
+            "containerId": "",
+            "created": "2023-06-08T03:47:39.332Z",
+            "sortNum": 20000
+        },
+        {
+            "_id": "5ec887d7-78bc-46e0-8520-346f33f4ce8f",
+            "name": "Auth",
+            "containerId": "",
+            "created": "2023-06-16T13:15:39.304Z",
+            "sortNum": 30000
+        }
+    ],
+    "requests": [
+        {
+            "_id": "4d7a0a3b-a979-4f40-a2a1-5239a6954ee6",
+            "colId": "4fd21fd0-144c-42a8-bded-be855c814df6",
+            "containerId": "9738c362-2d9f-49df-b7cf-73bd6cf65310",
+            "name": "Create",
+            "url": "{{apiUrl}}/announcements",
+            "method": "POST",
+            "sortNum": 10000,
+            "created": "2023-06-08T03:47:48.647Z",
+            "modified": "2023-06-10T03:24:35.967Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"title\":\"geladeira\",\n  \"description\": \"testando geladeira\",\n  \"is_new\": false,\n  \"price\": 22.06,\n  \"is_exchangeable\": true,\n  \"is_active\": true,\n  \"user_id\": 1,\n  \"images\": [\"url\"],\n  \"paymentMethods\": {\n    \"boleto\": false,\n    \"pix\": true,\n    \"cash\": true,\n    \"credit_card\": false,\n    \"bank_deposit\": false\n  }\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "c0c51c38-b06c-4dc9-bdd5-398626140e58",
+            "colId": "4fd21fd0-144c-42a8-bded-be855c814df6",
+            "containerId": "5ec887d7-78bc-46e0-8520-346f33f4ce8f",
+            "name": "SignIn",
+            "url": "http://localhost:8000/v1/signin",
+            "method": "POST",
+            "sortNum": 10000,
+            "created": "2023-06-15T19:43:56.640Z",
+            "modified": "2023-06-16T14:46:33.407Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"email\": \"admin@email.com\",\n  \"password\": \"admin123\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "e57de1f3-9685-4754-bcde-99d2dda4c252",
+            "colId": "4fd21fd0-144c-42a8-bded-be855c814df6",
+            "containerId": "02f0b239-f18c-42e0-9d9c-37e6e9ee1bab",
+            "name": "Create",
+            "url": "{{apiUrl}}/users",
+            "method": "POST",
+            "sortNum": 20000,
+            "created": "2023-06-08T02:30:04.937Z",
+            "modified": "2023-06-08T02:34:55.155Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"username\":\"goku\",\n  \"email\": \"goku@email.com\",\n  \"phone\": \"851233456789\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "f7263820-3f27-4752-85d1-0797d5dbb174",
+            "colId": "4fd21fd0-144c-42a8-bded-be855c814df6",
+            "containerId": "9738c362-2d9f-49df-b7cf-73bd6cf65310",
+            "name": "Update",
+            "url": "{{apiUrl}}/announcements/1",
+            "method": "PUT",
+            "sortNum": 20000,
+            "created": "2023-06-08T23:26:06.549Z",
+            "modified": "2023-06-09T00:49:47.857Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"title\":\"anuncio1 editado\",\n  \"description\": \"testando editar\",\n  \"is_new\": false,\n  \"price\": 22.06,\n  \"is_exchangeable\": true,\n  \"is_active\": true,\n  \"user_id\": 1,\n  \"images\": [\"url1\", \"url2\"],\n  \"paymentMethods\": {\n    \"boleto\": false,\n    \"pix\": true,\n    \"cash\": true,\n    \"credit_card\": true,\n    \"bank_deposit\": false\n  }\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "e868b3c4-734b-4e72-a57f-d43301d6ddfa",
+            "colId": "4fd21fd0-144c-42a8-bded-be855c814df6",
+            "containerId": "02f0b239-f18c-42e0-9d9c-37e6e9ee1bab",
+            "name": "Update",
+            "url": "{{apiUrl}}/users/4",
+            "method": "PUT",
+            "sortNum": 30000,
+            "created": "2023-06-08T02:34:59.061Z",
+            "modified": "2023-06-11T21:57:25.557Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\r\n  \"email\": \"goku@email.com\",\r\n  \"phone\": \"851234567891\",\r\n  \"username\": \"goku editadooooo\"\r\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "8d770bc8-2094-4875-8c65-e58623d87eb1",
+            "colId": "4fd21fd0-144c-42a8-bded-be855c814df6",
+            "containerId": "9738c362-2d9f-49df-b7cf-73bd6cf65310",
+            "name": "Update Copy",
+            "url": "{{apiUrl}}/announcements/2",
+            "method": "DELETE",
+            "sortNum": 30000,
+            "created": "2023-06-09T00:55:23.612Z",
+            "modified": "2023-06-09T00:56:44.839Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "d5b9ca35-bd50-424c-8673-f11c6896c44f",
+            "colId": "4fd21fd0-144c-42a8-bded-be855c814df6",
+            "containerId": "9738c362-2d9f-49df-b7cf-73bd6cf65310",
+            "name": "All",
+            "url": "{{apiUrl}}/announcements?userId=1",
+            "method": "GET",
+            "sortNum": 40000,
+            "created": "2023-06-09T02:38:57.772Z",
+            "modified": "2023-06-17T02:59:12.670Z",
+            "headers": [],
+            "params": [
+                {
+                    "name": "userId",
+                    "value": "1",
+                    "isPath": false
+                }
+            ],
+            "auth": {
+                "type": "bearer",
+                "bearer": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGVtYWlsLmNvbSIsImV4cCI6MTY4Njk3Nzc0MSwic3ViIjoiMSIsInVzZXJuYW1lIjoiYWRtaW4gZWRpdGFkbyJ9.JgmaDp2uHf5YLmm-ls8sMS5lpfjvCWm22oM8xGSkuTU"
+            },
+            "tests": []
+        },
+        {
+            "_id": "3b513d8a-4731-48d8-8ccf-5ba917bae36c",
+            "colId": "4fd21fd0-144c-42a8-bded-be855c814df6",
+            "containerId": "9738c362-2d9f-49df-b7cf-73bd6cf65310",
+            "name": "Get",
+            "url": "{{apiUrl}}/announcements/1?userId=1",
+            "method": "GET",
+            "sortNum": 50000,
+            "created": "2023-06-10T03:50:57.467Z",
+            "modified": "2023-06-10T04:28:14.715Z",
+            "headers": [],
+            "params": [
+                {
+                    "name": "userId",
+                    "value": "1",
+                    "isPath": false
+                }
+            ],
+            "tests": []
+        },
+        {
+            "_id": "16a847f0-d451-442a-9a16-72d973ce852c",
+            "colId": "4fd21fd0-144c-42a8-bded-be855c814df6",
+            "containerId": "",
+            "name": "Healthy",
+            "url": "http://localhost:8000/healthy",
+            "method": "GET",
+            "sortNum": 60000,
+            "created": "2023-06-12T01:33:23.951Z",
+            "modified": "2023-06-12T01:37:50.057Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        }
+    ],
+    "settings": {
+        "envId": "c9a7ef90-9ff6-4db5-9845-5939fa5d21d6"
+    }
+}
