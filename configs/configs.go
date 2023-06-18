@@ -9,10 +9,15 @@ import (
 func Load(env string) {
 	var err error
 
-	if env == "development" {
+	switch env {
+	case "development":
 		err = godotenv.Load()
-	} else {
+	case "test":
+		err = godotenv.Load(".env.test")
+	case "production":
 		err = godotenv.Load(".env.production")
+	default:
+		err = godotenv.Load()
 	}
 
 	if err != nil {
