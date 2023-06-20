@@ -9,11 +9,50 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/natan10/marketspace-api/dtos"
+	"github.com/natan10/marketspace-api/models"
 	"github.com/natan10/marketspace-api/services"
 )
 
 type UserController struct {
 	Service services.IUserService
+}
+
+// @Summary Update User
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param userId path int true "user id"
+// @Success 200 {object} dtos.UserDTO "response"
+// @Router /users/{userId} [get]
+func (us *UserController) GetUserInformation(w http.ResponseWriter, r *http.Request) {
+	userId, err := strconv.Atoi(chi.URLParam(r, "userId"))
+
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	var user *models.User
+
+	user, err = us.Service.GetUserById(int64(userId))
+
+	if user == nil && err == nil {
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode(dtos.UserDTO{
+		Email:    user.Email,
+		Username: user.Name,
+		Phone:    user.Phone,
+		Photo:    user.Photo,
+	})
+
 }
 
 // @Summary Create User

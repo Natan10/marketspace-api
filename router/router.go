@@ -34,6 +34,7 @@ func Router() chi.Router {
 
 		r.Route("/users", func(r chi.Router) {
 			r.Post("/", UserController.CreateUser)
+			r.Get("/{userId}", UserController.GetUserInformation)
 			r.Put("/{userId}", UserController.UpdateUser)
 		})
 

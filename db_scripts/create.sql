@@ -12,7 +12,7 @@ create table if not exists users (
 	email varchar(255) unique not null,
 	phone varchar(20) not null,
 	password varchar(20) not null,
-	photo varchar,
+	photo varchar not null default '',
 	created_at timestamp not null default now()
 );
 
