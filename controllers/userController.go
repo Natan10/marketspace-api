@@ -3,8 +3,11 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
 
 	"github.com/go-chi/chi"
@@ -15,6 +18,52 @@ import (
 
 type UserController struct {
 	Service services.IUserService
+}
+
+func (us *UserController) UploadUserAvatar(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseMultipartForm(20 << 20)
+
+	if err != nil {
+		log.Println("Failed to parse multipart form", err)
+		http.Error(w, "Failed to parse multipart form", http.StatusBadRequest)
+		return
+	}
+
+	filename := r.Form.Get("filename")
+	file, _, err := r.FormFile("file")
+
+	if err != nil {
+		log.Println("Failed to read file", err)
+		http.Error(w, "Failed to read file", http.StatusBadRequest)
+		return
+	}
+
+	defer file.Close()
+
+	// get path and create dir
+	path, _ := os.Getwd()
+	_ = os.Mkdir("tmp", os.ModePerm)
+
+	// create file
+	dstFile, err := os.Create(fmt.Sprintf("%v/%v", filepath.Join(path, "tmp"), filename))
+
+	if err != nil {
+		log.Println("Failed to create destination file", err)
+		http.Error(w, "Failed to create destination file", http.StatusInternalServerError)
+		return
+	}
+
+	defer dstFile.Close()
+
+	_, err = io.Copy(dstFile, file)
+
+	if err != nil {
+		log.Println("Failed to copy file content", err)
+		http.Error(w, "Failed to copy file content", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(200)
 }
 
 // @Summary Update User
@@ -61,7 +110,7 @@ func (us *UserController) GetUserInformation(w http.ResponseWriter, r *http.Requ
 // @Produce json
 // @Param request body dtos.UserDTO true "user payload"
 // @Success 200 {object} dtos.ResponseDTO "response"
-// @Router /users [post]
+// @Router /signup [post]
 func (uc *UserController) CreateUser(w http.ResponseWriter, r *http.Request) {
 	var user dtos.UserDTO
 

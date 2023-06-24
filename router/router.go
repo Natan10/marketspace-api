@@ -33,13 +33,12 @@ func Router() chi.Router {
 		r.Use(jwtauth.Authenticator)
 
 		r.Route("/users", func(r chi.Router) {
-			r.Post("/", UserController.CreateUser)
 			r.Get("/{userId}", UserController.GetUserInformation)
 			r.Put("/{userId}", UserController.UpdateUser)
+			r.Post("/users/avatar", UserController.UploadUserAvatar)
 		})
 
 		r.Route("/announcements", func(r chi.Router) {
-
 			r.Get("/", AnnouncementController.GetAll)
 			r.Get("/{announcementId}", AnnouncementController.Get)
 			r.Post("/", AnnouncementController.CreateAnnouncement)
@@ -51,6 +50,8 @@ func Router() chi.Router {
 	// public
 	r.Group(func(r chi.Router) {
 		r.Post("/signin", AuthController.SignIn)
+		r.Post("/signup", UserController.CreateUser)
+		r.Post("/signup/avatar", UserController.UploadUserAvatar)
 	})
 
 	return r

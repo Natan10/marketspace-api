@@ -36,6 +36,9 @@ func main() {
 	ch.Use(middleware.Heartbeat("/healthy"))
 	ch.Use(middleware.Logger)
 
+	path := "/photos"
+	ServerStaticFiles(ch, path, http.Dir("./tmp"))
+
 	ch.Route("/v1", func(ch chi.Router) {
 		ch.Get("/swagger/*", httpSwagger.Handler(
 			httpSwagger.URL(fmt.Sprintf("http://localhost:%v/v1/swagger/doc.json", port)),
@@ -45,4 +48,12 @@ func main() {
 
 	log.Printf("Server running at %v \n", port)
 	http.ListenAndServe(fmt.Sprintf(":%v", port), ch)
+}
+
+func ServerStaticFiles(r chi.Router, path string, root http.FileSystem) {
+	fs := http.StripPrefix(path, http.FileServer(root))
+
+	r.Get(path+"*", func(w http.ResponseWriter, r *http.Request) {
+		fs.ServeHTTP(w, r)
+	})
 }

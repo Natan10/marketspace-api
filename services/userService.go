@@ -28,7 +28,7 @@ func (u UserService) GetUserById(userId int64) (user *models.User, err error) {
 
 	defer db.Close()
 
-	sqlStatement := `SELECT u.id, u.email, u.phone, u.photo from users u WHERE u.id=$1`
+	sqlStatement := `SELECT u.email, u.username, u.phone, u.photo from users u WHERE u.id=$1`
 
 	user = new(models.User)
 

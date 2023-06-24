@@ -2,3 +2,5 @@
 .env.production
 .env.test
 *.sh
+
+/tmp
