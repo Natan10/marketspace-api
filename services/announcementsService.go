@@ -13,14 +13,89 @@ import (
 )
 
 type IAnnouncementsService interface {
+	GetAll() (announcements []models.Announcement, err error)
 	GetAnnouncement(useId int64, announcementId int64) (announcement *models.Announcement, err error)
-	GetAllAnnouncements(user_id int64) (announcements []models.Announcement, err error)
+	GetAllAnnouncementsByUser(user_id int64) (announcements []models.Announcement, err error)
 	CreateAnnouncement(an dtos.AnnouncementDTO) (id int16, err error)
 	UpdateAnnouncement(id int64, an dtos.AnnouncementDTO) (int64, error)
 	DeleteAnnouncement(id int64) (int64, error)
 }
 
 type AnnouncementsService struct{}
+
+func (s *AnnouncementsService) GetAll() (announcements []models.Announcement, err error) {
+	db, err := configs.OpenConn()
+
+	if err != nil {
+		log.Fatalf("Error to connect db: %v", err)
+		return
+	}
+
+	defer db.Close()
+
+	sqlStatement := `
+		SELECT  
+			a.id,
+			a.title,
+			a.description,
+			a.is_new,
+			a.price,
+			a.is_exchangeable,
+			a.is_active,
+			a.images,
+			a.user_id,
+			p.boleto,
+			p.pix,
+			p.cash,
+			p.credit_card,
+			p.bank_deposit
+		FROM announcements a INNER JOIN payment_methods p
+		ON p.announcement_id = a.id and a.is_active = 'true'
+	`
+	rows, err := db.Query(sqlStatement)
+
+	if err != nil {
+		log.Printf("Error query: %v\n", err)
+		return
+	}
+
+	for rows.Next() {
+		var an models.Announcement
+
+		err := rows.Scan(
+			&an.Id,
+			&an.Title,
+			&an.Description,
+			&an.IsNew,
+			&an.Price,
+			&an.IsExchangeable,
+			&an.IsActive,
+			pq.Array(&an.Images),
+			&an.UserId,
+			&an.Boleto,
+			&an.Pix,
+			&an.Cash,
+			&an.CreditCard,
+			&an.BankDeposit,
+		)
+
+		if err != nil {
+			log.Printf("Error scan: %v\n", err)
+			continue
+		}
+
+		announcements = append(announcements, an)
+	}
+
+	if err := rows.Err(); err != nil {
+		fmt.Println("Error ao buscar registros")
+	}
+
+	defer rows.Close()
+
+	return announcements, nil
+
+}
 
 func (s *AnnouncementsService) GetAnnouncement(useId int64, announcementId int64) (announcement *models.Announcement, err error) {
 	db, err := configs.OpenConn()
@@ -82,7 +157,7 @@ func (s *AnnouncementsService) GetAnnouncement(useId int64, announcementId int64
 	}
 }
 
-func (s *AnnouncementsService) GetAllAnnouncements(useId int64) (announcements []models.Announcement, err error) {
+func (s *AnnouncementsService) GetAllAnnouncementsByUser(useId int64) (announcements []models.Announcement, err error) {
 	db, err := configs.OpenConn()
 
 	if err != nil {

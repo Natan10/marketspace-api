@@ -84,31 +84,35 @@ func (ac *AnnouncementsController) Get(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {string} string
 // @Router /announcements [get]
 func (ac *AnnouncementsController) GetAll(w http.ResponseWriter, r *http.Request) {
-
 	param := r.URL.Query().Get("userId")
-
-	if param == "" {
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-		return
-	}
-
-	userId, err := strconv.Atoi(param)
-
-	if err != nil {
-		log.Fatalf("Error:%v", err)
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-		return
-	}
-
-	announcements, err := ac.Service.GetAllAnnouncements(int64(userId))
-
-	if err != nil {
-		log.Fatalf("Error:%v", err)
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
-
+	var announcements []models.Announcement
+	var err error
 	var response map[string][]models.Announcement
+
+	if param != "" {
+		userId, err := strconv.Atoi(param)
+		if err != nil {
+			log.Fatalf("Error:%v", err)
+			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			return
+		}
+		announcements, err = ac.Service.GetAllAnnouncementsByUser(int64(userId))
+
+		if err != nil {
+			log.Fatalf("Error:%v", err)
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+
+	} else {
+		announcements, err = ac.Service.GetAll()
+
+		if err != nil {
+			log.Fatalf("Error:%v", err)
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+	}
 
 	if len(announcements) > 0 {
 		response = map[string][]models.Announcement{
@@ -120,7 +124,6 @@ func (ac *AnnouncementsController) GetAll(w http.ResponseWriter, r *http.Request
 			"data": announcements,
 		}
 	}
-
 	w.Header().Add("Content-type", "application/json")
 	json.NewEncoder(w).Encode(response)
 }
