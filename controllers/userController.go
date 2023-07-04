@@ -42,10 +42,11 @@ func (us *UserController) UploadUserAvatar(w http.ResponseWriter, r *http.Reques
 
 	// get path and create dir
 	path, _ := os.Getwd()
-	_ = os.Mkdir("tmp", os.ModePerm)
+	tempPath := `tmp/avatars`
+	_ = os.MkdirAll(tempPath, os.ModePerm)
 
 	// create file
-	dstFile, err := os.Create(fmt.Sprintf("%v/%v", filepath.Join(path, "tmp"), filename))
+	dstFile, err := os.Create(fmt.Sprintf("%v/%v", filepath.Join(path, tempPath), filename))
 
 	if err != nil {
 		log.Println("Failed to create destination file", err)

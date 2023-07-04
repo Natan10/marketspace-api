@@ -44,6 +44,7 @@ func Router() chi.Router {
 			r.Post("/", AnnouncementController.CreateAnnouncement)
 			r.Put("/{announcementId}", AnnouncementController.UpdateAnnouncement)
 			r.Delete("/{announcementId}", AnnouncementController.DeleteAnnouncement)
+			r.Post("/upload", AnnouncementController.UploadAnnouncementPhotos)
 		})
 	})
 

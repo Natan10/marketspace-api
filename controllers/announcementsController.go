@@ -3,8 +3,11 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
 
 	"github.com/go-chi/chi"
@@ -15,6 +18,63 @@ import (
 
 type AnnouncementsController struct {
 	Service services.IAnnouncementsService
+}
+
+func (ac *AnnouncementsController) UploadAnnouncementPhotos(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseMultipartForm(32 << 20)
+
+	if err != nil {
+		log.Println("Failed to parse multipart form", err)
+		http.Error(w, "Failed to parse multipart form", http.StatusBadRequest)
+		return
+	}
+
+	path, _ := os.Getwd()
+	tempPath := `tmp/products`
+	_ = os.MkdirAll(tempPath, os.ModePerm)
+	joinPath := filepath.Join(path, tempPath)
+
+	files, _ := r.MultipartForm.File["images"]
+
+	uploadFiles := []int{}
+
+	for i, fileHeader := range files {
+
+		file, err := fileHeader.Open()
+
+		if err != nil {
+			log.Println("erro to upload file: " + fileHeader.Filename)
+			continue
+		}
+
+		defer file.Close()
+
+		// create new file upload
+		destination, err := os.Create(fmt.Sprintf("%v/%v", joinPath, fileHeader.Filename))
+
+		defer destination.Close()
+
+		if err != nil {
+			log.Println("Failed to create destination file", err)
+			continue
+		}
+
+		_, err = io.Copy(destination, file)
+
+		if err != nil {
+			log.Println("Failed to copy file content", err)
+			continue
+		}
+
+		uploadFiles = append(uploadFiles, i)
+	}
+
+	fmt.Println(len(uploadFiles), len(files))
+	if len(uploadFiles) == len(files) {
+		w.WriteHeader(200)
+		return
+	}
+	w.WriteHeader(http.StatusBadRequest)
 }
 
 // @Summary Get Announcement

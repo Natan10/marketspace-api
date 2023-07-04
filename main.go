@@ -36,7 +36,7 @@ func main() {
 	ch.Use(middleware.Heartbeat("/healthy"))
 	ch.Use(middleware.Logger)
 
-	path := "/photos"
+	path := "/assets"
 	ServerStaticFiles(ch, path, http.Dir("./tmp"))
 
 	ch.Route("/v1", func(ch chi.Router) {
