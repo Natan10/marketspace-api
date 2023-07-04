@@ -101,7 +101,6 @@ func (us *UserController) GetUserInformation(w http.ResponseWriter, r *http.Requ
 		Phone:    user.Phone,
 		Photo:    user.Photo,
 	})
-
 }
 
 // @Summary Create User
