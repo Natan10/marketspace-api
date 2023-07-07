@@ -69,7 +69,6 @@ func (ac *AnnouncementsController) UploadAnnouncementPhotos(w http.ResponseWrite
 		uploadFiles = append(uploadFiles, i)
 	}
 
-	fmt.Println(len(uploadFiles), len(files))
 	if len(uploadFiles) == len(files) {
 		w.WriteHeader(200)
 		return

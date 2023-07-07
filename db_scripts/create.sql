@@ -37,7 +37,7 @@ create table if not exists payment_methods(
 	cash bool,
 	credit_card bool,
 	bank_deposit bool,
-	announcement_id int not null,
+	announcement_id int unique not null,
 	foreign key(announcement_id) references announcements(id) on delete cascade
 );
 
@@ -74,3 +74,7 @@ values
 (6,false,true,true,false, false,6),
 (7,false,true,true,false, false,7),
 (8,false,true,true,false, false,8);
+
+SELECT setval(pg_get_serial_sequence('users', 'id'), coalesce(max(id)+1, 1), false) FROM users
+SELECT setval(pg_get_serial_sequence('announcements', 'id'), coalesce(max(id)+1, 1), false) FROM announcements 
+SELECT setval(pg_get_serial_sequence('payment_methods', 'id'), coalesce(max(id)+1, 1), false) FROM payment_methods  
