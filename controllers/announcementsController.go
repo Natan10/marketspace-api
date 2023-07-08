@@ -144,6 +144,7 @@ func (ac *AnnouncementsController) Get(w http.ResponseWriter, r *http.Request) {
 // @Router /announcements [get]
 func (ac *AnnouncementsController) GetAll(w http.ResponseWriter, r *http.Request) {
 	userIdParam := r.URL.Query().Get("userId")
+	params := r.URL.Query()
 
 	var announcements []models.Announcement
 	var err error
@@ -164,9 +165,17 @@ func (ac *AnnouncementsController) GetAll(w http.ResponseWriter, r *http.Request
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
-
 	} else {
-		announcements, err = ac.Service.GetAll()
+		var parsedParams = make(map[string]interface{})
+		for k, v := range params {
+			if k == "paymentMethods" {
+				parsedParams[k] = v
+			} else {
+				parsedParams[k] = v[0]
+			}
+		}
+
+		announcements, err = ac.Service.GetAll(parsedParams)
 
 		if err != nil {
 			log.Fatalf("Error:%v", err)

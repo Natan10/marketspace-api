@@ -10,10 +10,11 @@ import (
 	"github.com/natan10/marketspace-api/configs"
 	"github.com/natan10/marketspace-api/dtos"
 	"github.com/natan10/marketspace-api/models"
+	"github.com/natan10/marketspace-api/utils"
 )
 
 type IAnnouncementsService interface {
-	GetAll() (announcements []models.Announcement, err error)
+	GetAll(params map[string]interface{}) (announcements []models.Announcement, err error)
 	GetAnnouncement(useId int64, announcementId int64) (announcement *models.Announcement, err error)
 	GetAllAnnouncementsByUser(user_id int64) (announcements []models.Announcement, err error)
 	CreateAnnouncement(an dtos.AnnouncementDTO) (id int16, err error)
@@ -23,7 +24,7 @@ type IAnnouncementsService interface {
 
 type AnnouncementsService struct{}
 
-func (s *AnnouncementsService) GetAll() (announcements []models.Announcement, err error) {
+func (s *AnnouncementsService) GetAll(params map[string]interface{}) (announcements []models.Announcement, err error) {
 	db, err := configs.OpenConn()
 
 	if err != nil {
@@ -52,6 +53,14 @@ func (s *AnnouncementsService) GetAll() (announcements []models.Announcement, er
 		FROM announcements a INNER JOIN payment_methods p
 		ON p.announcement_id = a.id and a.is_active = 'true'
 	`
+
+	filterParams := utils.MountFilterQuery(params)
+
+	if filterParams != "" {
+		sqlStatement += fmt.Sprintf("WHERE %v", filterParams)
+	}
+
+	fmt.Println(sqlStatement)
 	rows, err := db.Query(sqlStatement)
 
 	if err != nil {
@@ -86,18 +95,14 @@ func (s *AnnouncementsService) GetAll() (announcements []models.Announcement, er
 
 		announcements = append(announcements, an)
 	}
-
 	if err := rows.Err(); err != nil {
 		fmt.Println("Error ao buscar registros")
 	}
-
 	defer rows.Close()
-
 	return announcements, nil
-
 }
 
-func (s *AnnouncementsService) GetAnnouncement(useId int64, announcementId int64) (announcement *models.Announcement, err error) {
+func (s *AnnouncementsService) GetAnnouncement(userId int64, announcementId int64) (announcement *models.Announcement, err error) {
 	db, err := configs.OpenConn()
 
 	if err != nil {
@@ -129,7 +134,7 @@ func (s *AnnouncementsService) GetAnnouncement(useId int64, announcementId int64
 	`
 	announcement = &models.Announcement{}
 
-	err = db.QueryRow(sqlStatement, useId, announcementId).Scan(
+	err = db.QueryRow(sqlStatement, userId, announcementId).Scan(
 		&announcement.Id,
 		&announcement.Title,
 		&announcement.Description,
