@@ -17,7 +17,8 @@ import (
 )
 
 type UserController struct {
-	Service services.IUserService
+	UserService         services.IUserService
+	AnnouncementService services.IAnnouncementsService
 }
 
 func (us *UserController) UploadUserAvatar(w http.ResponseWriter, r *http.Request) {
@@ -67,6 +68,58 @@ func (us *UserController) UploadUserAvatar(w http.ResponseWriter, r *http.Reques
 	w.WriteHeader(200)
 }
 
+// @Summary Get User Announcements
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param userId query int true "user id"
+// @Success 200 {object} map[string]models.Announcement
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /users/{userId}/announcements [get]
+func (ac *UserController) GetUserAnnouncements(w http.ResponseWriter, r *http.Request) {
+	userId, err := strconv.Atoi(chi.URLParam(r, "userId"))
+	param := r.URL.Query().Get("type")
+
+	if err != nil {
+		log.Fatalf("Error:%v", err)
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	var announcements []models.Announcement
+	var response map[string][]models.Announcement
+
+	if err != nil {
+		log.Fatalf("Error:%v", err)
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	fmt.Println("params: ", param)
+	announcements, err = ac.AnnouncementService.GetAllAnnouncementsByUser(int64(userId), param)
+
+	if err != nil {
+		log.Fatalf("Error:%v", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	if len(announcements) > 0 {
+		response = map[string][]models.Announcement{
+			"data": announcements,
+		}
+	} else {
+		announcements = make([]models.Announcement, 0)
+		response = map[string][]models.Announcement{
+			"data": announcements,
+		}
+	}
+	w.Header().Add("Content-type", "application/json")
+	json.NewEncoder(w).Encode(response)
+}
+
 // @Summary Update User
 // @Tags users
 // @Accept json
@@ -84,7 +137,7 @@ func (us *UserController) GetUserInformation(w http.ResponseWriter, r *http.Requ
 
 	var user *models.User
 
-	user, err = us.Service.GetUserById(int64(userId))
+	user, err = us.UserService.GetUserById(int64(userId))
 
 	if user == nil && err == nil {
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
@@ -124,7 +177,7 @@ func (uc *UserController) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	var response dtos.ResponseDTO
 
-	if id, err := uc.Service.CreateUser(user); err != nil {
+	if id, err := uc.UserService.CreateUser(user); err != nil {
 		response = dtos.ResponseDTO{
 			Error:   true,
 			Message: fmt.Sprintf("Erro ao criar usuario: %v", err),
@@ -167,7 +220,7 @@ func (uc *UserController) UpdateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rows, err := uc.Service.UpdateUser(int64(userId), user)
+	rows, err := uc.UserService.UpdateUser(int64(userId), user)
 
 	if err != nil {
 		log.Printf("Erro ao atualizar usuario: %v\n", err)

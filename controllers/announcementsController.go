@@ -136,52 +136,33 @@ func (ac *AnnouncementsController) Get(w http.ResponseWriter, r *http.Request) {
 // @Tags announcements
 // @Accept json
 // @Produce json
-// @Param userId query int true "user id"
 // @Success 200 {object} map[string]models.Announcement
 // @Failure 400 {string} string
 // @Failure 404 {string} string
 // @Failure 500 {string} string
 // @Router /announcements [get]
 func (ac *AnnouncementsController) GetAll(w http.ResponseWriter, r *http.Request) {
-	userIdParam := r.URL.Query().Get("userId")
 	params := r.URL.Query()
 
 	var announcements []models.Announcement
 	var err error
 	var response map[string][]models.Announcement
 
-	if userIdParam != "" {
-		userId, err := strconv.Atoi(userIdParam)
-		if err != nil {
-			log.Fatalf("Error:%v", err)
-			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-			return
+	var parsedParams = make(map[string]interface{})
+	for k, v := range params {
+		if k == "paymentMethods" {
+			parsedParams[k] = v
+		} else {
+			parsedParams[k] = v[0]
 		}
+	}
 
-		announcements, err = ac.Service.GetAllAnnouncementsByUser(int64(userId))
+	announcements, err = ac.Service.GetAll(parsedParams)
 
-		if err != nil {
-			log.Fatalf("Error:%v", err)
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-			return
-		}
-	} else {
-		var parsedParams = make(map[string]interface{})
-		for k, v := range params {
-			if k == "paymentMethods" {
-				parsedParams[k] = v
-			} else {
-				parsedParams[k] = v[0]
-			}
-		}
-
-		announcements, err = ac.Service.GetAll(parsedParams)
-
-		if err != nil {
-			log.Fatalf("Error:%v", err)
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-			return
-		}
+	if err != nil {
+		log.Fatalf("Error:%v", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
 	}
 
 	if len(announcements) > 0 {

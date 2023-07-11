@@ -16,7 +16,7 @@ import (
 type IAnnouncementsService interface {
 	GetAll(params map[string]interface{}) (announcements []models.Announcement, err error)
 	GetAnnouncement(useId int64, announcementId int64) (announcement *models.Announcement, err error)
-	GetAllAnnouncementsByUser(user_id int64) (announcements []models.Announcement, err error)
+	GetAllAnnouncementsByUser(user_id int64, param string) (announcements []models.Announcement, err error)
 	CreateAnnouncement(an dtos.AnnouncementDTO) (id int16, err error)
 	UpdateAnnouncement(id int64, an dtos.AnnouncementDTO) (int64, error)
 	DeleteAnnouncement(id int64) (int64, error)
@@ -162,7 +162,7 @@ func (s *AnnouncementsService) GetAnnouncement(userId int64, announcementId int6
 	}
 }
 
-func (s *AnnouncementsService) GetAllAnnouncementsByUser(useId int64) (announcements []models.Announcement, err error) {
+func (s *AnnouncementsService) GetAllAnnouncementsByUser(useId int64, param string) (announcements []models.Announcement, err error) {
 	db, err := configs.OpenConn()
 
 	if err != nil {
@@ -172,7 +172,7 @@ func (s *AnnouncementsService) GetAllAnnouncementsByUser(useId int64) (announcem
 
 	defer db.Close()
 
-	sql := `
+	sqlStatement := `
 		SELECT  
 			a.id,
 			a.title,
@@ -193,7 +193,23 @@ func (s *AnnouncementsService) GetAllAnnouncementsByUser(useId int64) (announcem
 		WHERE a.user_id=$1
 	`
 
-	rows, err := db.Query(sql, useId)
+	var paramFilter string = ""
+
+	if param != "" {
+		switch param {
+		case "active":
+			paramFilter = "is_active='true'"
+		case "not_active":
+			paramFilter = "is_active='false'"
+		default:
+		}
+	}
+
+	if paramFilter != "" {
+		sqlStatement += " and " + paramFilter
+	}
+
+	rows, err := db.Query(sqlStatement, useId)
 
 	if err != nil {
 		log.Printf("Error query: %v\n", err)

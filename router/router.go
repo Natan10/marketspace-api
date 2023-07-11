@@ -21,7 +21,8 @@ func Router() chi.Router {
 	}
 
 	UserController := controllers.UserController{
-		Service: userService,
+		UserService:         &userService,
+		AnnouncementService: &announcementService,
 	}
 
 	AuthController := controllers.AuthController{
@@ -36,6 +37,7 @@ func Router() chi.Router {
 			r.Get("/{userId}", UserController.GetUserInformation)
 			r.Put("/{userId}", UserController.UpdateUser)
 			r.Post("/users/avatar", UserController.UploadUserAvatar)
+			r.Get("/{userId}/announcements", UserController.GetUserAnnouncements)
 		})
 
 		r.Route("/announcements", func(r chi.Router) {
