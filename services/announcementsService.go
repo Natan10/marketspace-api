@@ -60,7 +60,6 @@ func (s *AnnouncementsService) GetAll(params map[string]interface{}) (announceme
 		sqlStatement += fmt.Sprintf("WHERE %v", filterParams)
 	}
 
-	fmt.Println(sqlStatement)
 	rows, err := db.Query(sqlStatement)
 
 	if err != nil {
@@ -197,10 +196,10 @@ func (s *AnnouncementsService) GetAllAnnouncementsByUser(useId int64, param stri
 
 	if param != "" {
 		switch param {
-		case "active":
-			paramFilter = "is_active='true'"
-		case "not_active":
-			paramFilter = "is_active='false'"
+		case "used":
+			paramFilter = "is_new='false'"
+		case "new":
+			paramFilter = "is_new='true'"
 		default:
 		}
 	}
