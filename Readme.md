@@ -55,4 +55,4 @@ env flag is optional, if you don't pass it then .env is loaded otherwise you can
 
 ### Swagger
 
-To access swagger, you just access this [url]("http://localhost:8000/v1/swagger/index.html#/").
+To access swagger, you just access this [http://localhost:8000/v1/swagger/index.html#/]("http://localhost:8000/v1/swagger/index.html#/").
