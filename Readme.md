@@ -1,5 +1,18 @@
 # MARKETSPACE API 🚀
 
+![Capa](/images/Capa.png)
+
+Api made in Golang for the marketspace
+
+technologies used:
+  - Go 1.2
+  - Go-chi v1.5.4
+  - Go-chi/jwtauth v5.1.0
+  - Swaggo/http-swagger v1.3.4
+  - Swaggo/swag v1.16.1
+  - Docker v20.10.17
+  - Docker-compose v2.10.2
+
 ## How to Run?
 
 ### Docker and Docker-compose
